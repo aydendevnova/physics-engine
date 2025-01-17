@@ -17,9 +17,13 @@ bool init_renderer(World* world) {
         return false;
     }
     
+    // Position debug window next to main window
+    int x, y;
+    SDL_GetWindowPosition(world->window, &x, &y);
+    
     // Create debug window
     world->debug_window = SDL_CreateWindow("Debug Info",
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        x + WINDOW_WIDTH + 10, y,  // Position to the right of main window
         DEBUG_WINDOW_WIDTH, DEBUG_WINDOW_HEIGHT, 
         SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!world->debug_window) {
@@ -28,6 +32,10 @@ bool init_renderer(World* world) {
         SDL_Quit();
         return false;
     }
+
+    // Bring windows to front initially
+    SDL_RaiseWindow(world->window);
+    SDL_RaiseWindow(world->debug_window);
     
     // Create main renderer with vsync
     world->renderer = SDL_CreateRenderer(world->window, -1,

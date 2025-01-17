@@ -9,14 +9,33 @@ bool init_ui(World* world) {
         return false;
     }
 
-    // Set up font
+    // Get display scale factor for HiDPI support
+    int render_w, render_h, window_w, window_h;
+    float scale_x, scale_y;
+    SDL_GetRendererOutputSize(world->debug_renderer, &render_w, &render_h);
+    SDL_GetWindowSize(world->debug_window, &window_w, &window_h);
+    scale_x = (float)render_w / window_w;
+    scale_y = (float)render_h / window_h;
+    float scale = scale_x; // Use x scale as they should be the same
+    
+    // Set up font with proper scaling
     struct nk_font_atlas* atlas;
     nk_sdl_font_stash_begin(&atlas);
-    struct nk_font* font = nk_font_atlas_add_default(atlas, 13, NULL);
+    // Scale base font size (13) by the display scale factor
+    struct nk_font* font = nk_font_atlas_add_default(atlas, 13.0f * scale, NULL);
     nk_sdl_font_stash_end();
     
     if (font) {
         nk_style_set_font(world->nk_ctx, &font->handle);
+        
+        // Scale the rest of the UI
+        struct nk_style* style = &world->nk_ctx->style;
+        style->window.spacing = nk_vec2(4 * scale, 4 * scale);
+        style->window.padding = nk_vec2(4 * scale, 4 * scale);
+        style->window.group_padding = nk_vec2(4 * scale, 4 * scale);
+        style->window.popup_padding = nk_vec2(4 * scale, 4 * scale);
+        style->window.combo_padding = nk_vec2(4 * scale, 4 * scale);
+        style->window.scrollbar_size = nk_vec2(10 * scale, 10 * scale);
     }
 
     return true;
@@ -110,8 +129,12 @@ void update_ui(World* world) {
     SDL_SetRenderDrawColor(world->debug_renderer, 35, 35, 35, 255);
     SDL_RenderClear(world->debug_renderer);
 
+    // Get actual render dimensions for HiDPI
+    int render_w, render_h;
+    SDL_GetRendererOutputSize(world->debug_renderer, &render_w, &render_h);
+
     if (nk_begin(world->nk_ctx, "Physics Debug", 
-        nk_rect(0, 0, DEBUG_WINDOW_WIDTH, DEBUG_WINDOW_HEIGHT),
+        nk_rect(0, 0, render_w, render_h),
         NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
         
         // Simulation Overview
