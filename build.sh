@@ -7,8 +7,11 @@ SDL_LIBS=$(pkg-config --libs sdl2)
 # Create build directory if it doesn't exist
 mkdir -p build
 
+# Find all .c files
+SOURCES=$(find src -name "*.c")
+
 # Compile with all necessary flags
-clang src/main.c -o build/physics_engine \
+clang $SOURCES -o build/physics_engine \
     $SDL_CFLAGS \
     $SDL_LIBS \
     -Wall -Wextra \
