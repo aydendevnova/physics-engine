@@ -1,70 +1,16 @@
 # 2D Physics Engine
 
-A simple 2D physics engine implementation in C using SDL2 for rendering and Nuklear for debug UI. The engine simulates basic rigid body dynamics with collision detection and resolution.
+A simple 2D physics engine implementation in C using SDL2 for rendering and Nuklear for debug UI. The engine simulates basic rigid body dynamics with collision detection and resolution. Not production ready, this is a hobby project.
 
 ## Features
 
-- Circle-based rigid body physics simulation
-- Velocity Verlet integration for accurate motion
-- Collision detection and resolution between circles
+- Velocity Verlet integration for motion
 - Boundary collision handling
-- Real-time debug visualization
-- Properties inspector UI for all physics bodies
-
-## Technical Details
-
-### Physics Implementation
-
-The core physics system uses the following components:
-
-1. **Velocity Verlet Integration**
-
-   - Updates positions and velocities in two steps
-   - Provides more accurate results than basic Euler integration
-   - Handles acceleration changes during timestep
-
-2. **Circle Collision Detection & Resolution**
-
-   - Checks overlapping circles using distance comparison
-   - Resolves collisions with position correction
-   - Applies impulse-based velocity changes
-   - Uses multiple iterations for stability
-
-3. **Force Application**
-   - Gravity constant of 784.0 units/s²
-   - Elastic collisions with 0.8 restitution
-   - Linear force accumulation
-
-### Visualization
-
-The engine provides two windows:
-
-1. Main simulation window showing the physics bodies in motion
-2. Debug window with real-time physics properties:
-   - Position (x,y)
-   - Velocity (vx,vy)
-   - Acceleration (ax,ay)
-   - Mass
-   - Radius
-   - Speed
-   - Kinetic Energy
-
-### Key Constants
-
-- GRAVITY: 784.0f
-- RESTITUTION: 0.8f
-- TIME_SCALE: 1.0f
-- COLLISION_ITERATIONS: 2
-- MIN_SEPARATION: 0.01f
-- WINDOW_WIDTH: 800
-- WINDOW_HEIGHT: 600
-- DEBUG_WINDOW_WIDTH: 400
-- DEBUG_WINDOW_HEIGHT: 600
-- FPS_CAP: 120
+- Real-time debug visualization with inspector
 
 ## Building and Running
 
-The project uses a bash build script that compiles all source files and links with SDL2. Build and run with:
+The project uses a bash build script that compiles all source files and links with SDL2. Currently it might only work on macOS with Homebrew. Build and run with:
 
 1. Execute build script: `./build.sh`
 2. Run executable: `./build/engine`
@@ -96,7 +42,7 @@ The physics engine implements:
 - Configurable simulation parameters
 - Modular architecture separating physics, rendering and UI
 
-## Future Improvements
+## Future Considerations
 
 1. Additional collision shapes (polygons)
 2. Joints and constraints
