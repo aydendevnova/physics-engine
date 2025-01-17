@@ -5,6 +5,9 @@
 #include "utils/random.h"
 #include <stdlib.h>
 
+// Constants for impulse behavior
+#define IMPULSE_STRENGTH 1000.0f
+
 int main() {
     World world = {0};
     world.running = true;
@@ -22,6 +25,10 @@ int main() {
         free(world.bodies);
         return 1;
     }
+    
+    // Store window IDs for event handling
+    Uint32 main_window_id = SDL_GetWindowID(world.window);
+    Uint32 debug_window_id = SDL_GetWindowID(world.debug_window);
     
     // Create initial bodies
     for (int i = 0; i < world.bodyCount; i++) {
@@ -41,6 +48,52 @@ int main() {
         Uint32 currentTime = SDL_GetTicks();
         float dt = (currentTime - lastTime) / 1000.0f;
         lastTime = currentTime;
+        
+        // Start UI input handling
+        nk_input_begin(world.nk_ctx);
+        
+        // Handle events
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                world.running = false;
+                continue;
+            }
+            else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+                if (event.window.windowID == main_window_id || 
+                    event.window.windowID == debug_window_id) {
+                    world.running = false;
+                    continue;
+                }
+            }
+            
+            // If event is in debug window, let Nuklear handle it
+            if (event.window.windowID == debug_window_id) {
+                nk_sdl_handle_event(&event);
+            }
+            // If event is in main window, handle physics
+            else if (event.window.windowID == main_window_id && 
+                     event.type == SDL_MOUSEBUTTONDOWN && 
+                     event.button.button == SDL_BUTTON_LEFT) {
+                
+                int mouseX = event.button.x;
+                int mouseY = event.button.y;
+                
+                // Find clicked body
+                Body* clickedBody = get_body_at_position(&world, mouseX, mouseY);
+                if (clickedBody) {
+                    // Get edge point and normal
+                    float edgeX, edgeY, normalX, normalY;
+                    get_closest_edge_info(clickedBody, mouseX, mouseY, &edgeX, &edgeY, &normalX, &normalY);
+                    
+                    // Apply impulse in the direction of the normal
+                    apply_impulse(clickedBody, normalX * IMPULSE_STRENGTH, normalY * IMPULSE_STRENGTH);
+                }
+            }
+        }
+        
+        // End UI input handling
+        nk_input_end(world.nk_ctx);
         
         update_physics(&world, dt);
         render_world(&world);

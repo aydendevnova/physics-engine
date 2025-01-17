@@ -138,4 +138,50 @@ void update_physics(World* world, float dt) {
     for (int i = 0; i < COLLISION_ITERATIONS; i++) {
         handle_collisions(world);
     }
+}
+
+void apply_impulse(Body* body, float ix, float iy) {
+    body->vx += ix / body->mass;
+    body->vy += iy / body->mass;
+}
+
+Body* get_body_at_position(World* world, int x, int y) {
+    for (int i = 0; i < world->bodyCount; i++) {
+        Body* body = &world->bodies[i];
+        float dx = x - body->x;
+        float dy = y - body->y;
+        float distance = sqrtf(dx * dx + dy * dy);
+        
+        if (distance <= body->radius) {
+            return body;
+        }
+    }
+    return NULL;
+}
+
+void get_closest_edge_info(Body* body, int click_x, int click_y, float* edge_x, float* edge_y, float* normal_x, float* normal_y) {
+    // Vector from center to click point
+    float dx = click_x - body->x;
+    float dy = click_y - body->y;
+    float distance = sqrtf(dx * dx + dy * dy);
+    
+    // Normalize the direction vector
+    float dir_x = dx / distance;
+    float dir_y = dy / distance;
+    
+    // Edge point is radius units away from center in the direction of click
+    *edge_x = body->x + dir_x * body->radius;
+    *edge_y = body->y + dir_y * body->radius;
+    
+    // For upward-only bounces:
+    // - Keep the x component of the normal (for sideways movement)
+    // - Force the y component to be negative (upward)
+    // - Re-normalize the vector
+    float ny = -0.7f; // Fixed upward component
+    float nx = dir_x;
+    
+    // Normalize the resulting vector
+    float norm = sqrtf(nx * nx + ny * ny);
+    *normal_x = nx / norm;
+    *normal_y = ny / norm;
 } 

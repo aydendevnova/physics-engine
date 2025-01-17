@@ -106,25 +106,6 @@ static void draw_body_properties(struct nk_context* ctx, Body* body, int index) 
 }
 
 void update_ui(World* world) {
-    // Handle events
-    nk_input_begin(world->nk_ctx);
-    SDL_Event evt;
-    while (SDL_PollEvent(&evt)) {
-        if (evt.type == SDL_QUIT) {
-            world->running = false;
-        }
-        else if (evt.type == SDL_WINDOWEVENT) {
-            if (evt.window.event == SDL_WINDOWEVENT_CLOSE) {
-                SDL_Window* window = SDL_GetWindowFromID(evt.window.windowID);
-                if (window == world->window || window == world->debug_window) {
-                    world->running = false;
-                }
-            }
-        }
-        nk_sdl_handle_event(&evt);
-    }
-    nk_input_end(world->nk_ctx);
-
     // Clear background
     SDL_SetRenderDrawColor(world->debug_renderer, 35, 35, 35, 255);
     SDL_RenderClear(world->debug_renderer);
