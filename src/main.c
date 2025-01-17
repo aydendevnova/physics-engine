@@ -1,6 +1,7 @@
 #include "core/types.h"
 #include "physics/physics.h"
 #include "render/renderer.h"
+#include "ui/ui.h"
 #include "utils/random.h"
 #include <stdlib.h>
 
@@ -13,6 +14,11 @@ int main() {
     // Initialize systems
     init_random();
     if (!init_renderer(&world)) {
+        free(world.bodies);
+        return 1;
+    }
+    if (!init_ui(&world)) {
+        cleanup_renderer(&world);
         free(world.bodies);
         return 1;
     }
@@ -32,25 +38,21 @@ int main() {
     
     Uint32 lastTime = SDL_GetTicks();
     while (world.running) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT)
-                world.running = false;
-        }
-        
         Uint32 currentTime = SDL_GetTicks();
         float dt = (currentTime - lastTime) / 1000.0f;
         lastTime = currentTime;
         
         update_physics(&world, dt);
         render_world(&world);
+        update_ui(&world);
         
         SDL_Delay(1000 / FPS_CAP);
     }
     
     // Cleanup
-    free(world.bodies);
+    cleanup_ui(&world);
     cleanup_renderer(&world);
+    free(world.bodies);
     
     return 0;
 }

@@ -2,16 +2,18 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build and Run Physics Engine",
+      "label": "Build Engine",
       "type": "shell",
-      "command": "./build.sh && ./build/physics_engine",
+      "command": "./build.sh",
       "group": {
         "kind": "build",
         "isDefault": true
       },
       "presentation": {
         "reveal": "always",
-        "panel": "shared"
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
       },
       "problemMatcher": {
         "owner": "cpp",
@@ -25,6 +27,18 @@
           "message": 5
         }
       }
+    },
+    {
+      "label": "Run Engine",
+      "type": "shell",
+      "command": "./build/engine",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "dependsOn": "Build Engine",
+      "dependsOrder": "sequence"
     }
   ]
 }

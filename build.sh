@@ -1,26 +1,41 @@
 #!/bin/bash
 
+# Create build directory if it doesn't exist
+mkdir -p build
+
 # Get SDL2 flags from pkg-config
 SDL_CFLAGS=$(pkg-config --cflags sdl2)
 SDL_LIBS=$(pkg-config --libs sdl2)
 
-# Create build directory if it doesn't exist
-mkdir -p build
+# Common compiler flags
+# Put our include directory first so our SDL.h is found before system ones
+CFLAGS="-I./include -Wall -Wextra $SDL_CFLAGS"
 
-# Find all .c files
-SOURCES=$(find src -name "*.c")
+# Compile source files
+gcc $CFLAGS -c src/main.c -o build/main.o
+gcc $CFLAGS -c src/physics/physics.c -o build/physics.o
+gcc $CFLAGS -c src/render/renderer.c -o build/renderer.o
+gcc $CFLAGS -c src/utils/random.c -o build/random.o
+gcc $CFLAGS -c src/ui/ui.c -o build/ui.o
+gcc $CFLAGS -c src/ui/nuklear_impl.c -o build/nuklear_impl.o
 
-# Compile with all necessary flags
-clang $SOURCES -o build/physics_engine \
-    $SDL_CFLAGS \
+# Link object files
+gcc build/main.o \
+    build/physics.o \
+    build/renderer.o \
+    build/random.o \
+    build/ui.o \
+    build/nuklear_impl.o \
+    -o build/engine \
     $SDL_LIBS \
-    -Wall -Wextra \
+    -lm \
     -framework OpenGL \
     -framework Cocoa
 
-# Check if compilation was successful
+# Check if build succeeded
 if [ $? -eq 0 ]; then
-    echo "Build successful! Run with: ./build/physics_engine"
+    echo "Build successful!"
+    echo "Run ./build/engine to start the application"
 else
     echo "Build failed!"
 fi

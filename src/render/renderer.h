@@ -12,4 +12,7 @@ void cleanup_renderer(World* world);
 // Render the current state of the world
 void render_world(World* world);
 
+// Render debug information
+void render_debug_info(World* world);
+
 #endif // RENDERER_H 
